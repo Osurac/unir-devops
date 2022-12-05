@@ -10,13 +10,6 @@ pipeline {
     agent none //Con agent none hay que especificar el agente en los stages, sino agent any
 
     stages {
-        stage('Get Code') {
-            agent { label 'linux' }
-            steps {
-                //Obtener el código del repo del profesor
-                git 'https://github.com/anieto-unir/helloworld.git'
-            }
-        }
         stage('Build') {
             agent { label 'linux' }
             steps {
