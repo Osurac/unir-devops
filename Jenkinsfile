@@ -10,6 +10,12 @@ pipeline {
     agent none //Con agent none hay que especificar el agente en los stages, sino agent any
 
     stages {
+        stage('Branch') {
+            agent { label 'linux' }
+            steps {
+               echo 'DEVELOP'
+            }
+        }
         stage('Build') {
             agent { label 'linux' }
             steps {
