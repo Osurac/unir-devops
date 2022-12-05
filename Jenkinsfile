@@ -13,7 +13,7 @@ pipeline {
         stage('Branch') {
             agent { label 'linux' }
             steps {
-               echo 'RELEASE'
+               echo 'RELEASE-FORCE'
             }
         }
         stage('Build') {
