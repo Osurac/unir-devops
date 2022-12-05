@@ -1,52 +1,66 @@
-pipeline {
-    agent any
+def genericsh(cmd){
+    if(isUnix()){
+        sh cmd
+    }else{
+        bat cmd
+    }
+}
 
-     stages {
+pipeline {
+    agent none //Con agent none hay que especificar el agente en los stages, sino agent any
+
+    stages {
         stage('Get Code') {
+            agent { label 'linux' }
             steps {
-                // Obtener código del repo
-                //git 'https://github.com/anieto-unir/helloworld.git'
-		script {
-			scmVars = checkout scm
-			echo 'scm : the commit id is ' + scmVars.GIT_COMMIT
-		}
+                //Obtener el código del repo del profesor
+                git 'https://github.com/anieto-unir/helloworld.git'
             }
         }
-        
         stage('Build') {
+            agent { label 'linux' }
             steps {
-                echo 'Eyyy, esto es Python. No hay que compilar nada!!!'
-		echo 'El workspace contiene el commit \'' + scmVars.GIT_COMMIT + '\' de la rama \'' + scmVars.GIT_BRANCH + '\''
+               echo 'Hacemos como que compilamos en python...'
+               echo WORKSPACE
+               genericsh 'ls'
             }
         }
-        
-        stage('Tests') {
-            parallel {
+        stage('Test'){
+            parallel{
                 stage('Unit') {
+                    agent { label 'linux' }
                     steps {
-                        bat '''
-                            set PYTHONPATH=%WORKSPACE%
-                            pytest --junitxml=result-unit.xml test\\unit
-                        '''
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE'){
+                            echo WORKSPACE
+                            genericsh'''
+                                export PYTHONPATH=.
+                                pytest --junitxml=result-unit.xml test//unit
+                            '''
+                        }
                     }
                 }
-                stage('Service') {
+                stage('Rest') {
+                    agent { label 'linux' }
                     steps {
-                        bat '''
-                            set FLASK_APP=app\\api.py
-                            set FLASK_ENV=development
-                            start flask run
-                            start java -jar C:\\Unir\\Ejercicios\\wiremock\\wiremock-jre8-standalone-2.28.0.jar --port 9090 --root-dir C:\\Unir\\Ejercicios\\wiremock
-                            set PYTHONPATH=%WORKSPACE%
-                            pytest --junitxml=result-rest.xml test\\rest
-                        '''
-                    }    
+                        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE'){
+                            echo WORKSPACE
+                            genericsh'''
+                                export FLASK_APP=app//api.py
+                                flask run &
+                                java -jar //home//jenkins//agent//wiremock//wiremock-jre8-standalone-2.28.0.jar --port 9090 --root-dir test//wiremock --verbose &
+                                sleep 1
+                                export PYTHONPATH=.
+                                pytest --junitxml=result-test.xml test//rest
+                            '''
+                        }
+                    }
                 }
             }
         }
-        stage ('Results') {
+        stage('Results') {
+            agent { label 'linux' }
             steps {
-                junit 'result*.xml'
+                junit 'result-unit.xml'
             }
         }
     }
