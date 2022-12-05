@@ -7,17 +7,15 @@ def genericsh(cmd){
 }
 
 pipeline {
-    agent none //Con agent none hay que especificar el agente en los stages, sino agent any
+    agent any //Con agent none hay que especificar el agente en los stages, sino agent any
 
     stages {
         stage('Branch') {
-            agent { label 'linux' }
             steps {
                echo 'MAIN'
             }
         }        
         stage('Build') {
-            agent { label 'linux' }
             steps {
                echo 'Hacemos como que compilamos en python...'
                echo WORKSPACE
@@ -27,7 +25,6 @@ pipeline {
         stage('Test'){
             parallel{
                 stage('Unit') {
-                    agent { label 'linux' }
                     steps {
                         catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE'){
                             echo WORKSPACE
@@ -39,7 +36,6 @@ pipeline {
                     }
                 }
                 stage('Rest') {
-                    agent { label 'linux' }
                     steps {
                         catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE'){
                             echo WORKSPACE
@@ -56,8 +52,13 @@ pipeline {
                 }
             }
         }
-        stage('Results') {
+        stage('Deploy') {
             agent { label 'linux' }
+            steps {
+                echo 'Solo funciono en la rama de main'
+            }
+        }
+        stage('Results') {
             steps {
                 junit 'result-unit.xml'
             }
