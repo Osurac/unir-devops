@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Branch') {
             steps {
-               echo 'MAIN'
+               echo 'FEATURE/TEST'
             }
         }        
         stage('Build') {
