@@ -53,8 +53,9 @@ pipeline {
             }
         }
         stage('Deploy') {
-            agent { label 'linux' }
+            agent { label 'deploy' }
             steps {
+                echo WORKSPACE
                 echo 'Solo funciono en la rama de main'
             }
         }
