@@ -58,6 +58,9 @@ pipeline {
         }
         stage('Deploy') {
             agent { label 'deploy' }
+            when {
+                branch 'main'
+            }
             steps {
                 echo WORKSPACE
                 echo 'Solo funciono en la rama de main'
