@@ -11,10 +11,11 @@ pipeline {
 
     stages {
         stage('Branch') {
+            agent { label 'linux' }
             steps {
-               echo 'FEATURE/TEST'
+               echo env.BRANCH_NAME
             }
-        }        
+        }
         stage('Build') {
             steps {
                echo 'Hacemos como que compilamos en python...'
@@ -53,8 +54,15 @@ pipeline {
             }
         }
         stage('Deploy') {
-            agent { label 'linux' }
+            agent { label 'deploy' }
+            when {
+                beforeAgent true;
+                expression {
+                    return env.BRANCH_NAME == 'main';
+                }
+            }
             steps {
+                echo WORKSPACE
                 echo 'Solo funciono en la rama de main'
             }
         }
