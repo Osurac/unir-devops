@@ -56,13 +56,14 @@ pipeline {
                 }
             }
         }
-        if (env.BRANCH_NAME == "main") {          
-            stage('Deploy') {
-                agent { label 'deploy' }
-                steps {
-                    echo WORKSPACE
-                    echo 'Solo funciono en la rama de main'
-                }
+        stage('Deploy') {
+            agent { label 'deploy' }
+            when {
+                branch 'main'
+            }
+            steps {
+                echo WORKSPACE
+                echo 'Solo funciono en la rama de main'
             }
         }
         stage('Results') {
