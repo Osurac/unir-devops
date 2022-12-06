@@ -13,7 +13,7 @@ pipeline {
         stage('Branch') {
             agent { label 'linux' }
             steps {
-               echo 'RELEASE-FORCE'
+               echo env.BRANCH_NAME
             }
         }
         stage('Build') {
@@ -54,6 +54,16 @@ pipeline {
                         }
                     }
                 }
+            }
+        }
+        stage('Deploy') {
+            agent { label 'deploy' }
+            when {
+                branch 'main'
+            }
+            steps {
+                echo WORKSPACE
+                echo 'Solo funciono en la rama de main'
             }
         }
         stage('Results') {
