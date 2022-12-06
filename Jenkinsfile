@@ -13,7 +13,7 @@ pipeline {
         stage('Branch') {
             agent { label 'linux' }
             steps {
-               echo 'DEVELOP'
+               echo env.BRANCH_NAME
             }
         }
         stage('Build') {
