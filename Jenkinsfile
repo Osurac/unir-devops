@@ -59,7 +59,10 @@ pipeline {
         stage('Deploy') {
             agent { label 'deploy' }
             when {
-                branch 'main'
+                beforeAgent true;
+                expression {
+                    return env.BRANCH_NAME == 'main';
+                }
             }
             steps {
                 echo WORKSPACE
